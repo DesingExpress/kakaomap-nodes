@@ -14,9 +14,16 @@ export class kakaoMap extends ImPure {
     this.addOutput("component", "");
     this.addOutput("onReady", -1);
     this.addOutput("API", "kakaoAPI");
+    this.addOutput("onClick", -1);
+    this.addOutput("clicked", "");
+
     this.MAP_API_FUNC = (m) => {
-      this.triggerSlot(2);
       this.setOutputData(3, m);
+      this.triggerSlot(2);
+    };
+    this.onClickMap = (v) => {
+      this.setOutputData(5, v);
+      this.triggerSlot(4);
     };
   }
 
@@ -28,6 +35,7 @@ export class kakaoMap extends ImPure {
         lat={this.getInputData(2)}
         lng={this.getInputData(3)}
         cb={this.MAP_API_FUNC}
+        onClick={this.onClickMap}
       />
     );
     this.setOutputData(2, this.MAP_API);

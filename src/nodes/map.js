@@ -1,12 +1,14 @@
 import { useLayoutEffect, useRef } from "react";
 
-export function MapComponent({ appKey, lat, lng, cb }) {
+export function MapComponent({ appKey, lat, lng, cb, onClick }) {
   const _ref = useRef();
   useLayoutEffect(() => {
     let map;
+    // let arr = [];
     const _scriptElem = document.createElement("script");
     _scriptElem.type = "text/javascript";
-    _scriptElem.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${appKey}&autoload=false`;
+    _scriptElem.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${appKey}&libraries=clusterer&autoload=false`;
+    // _scriptElem.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${appKey}&autoload=false`;
 
     _scriptElem.onload = () => {
       window.kakao.maps.load(() => {
@@ -16,13 +18,16 @@ export function MapComponent({ appKey, lat, lng, cb }) {
             lat ?? 33.450701,
             lng ?? 126.570667
           ), // 지도의 중심좌표
-          level: 4, // 지도의 확대 레벨
+          level: 3, // 지도의 확대 레벨
         });
         cb(map);
+
+        window.kakao.maps.event.addListener(map, "click", function (e) {
+          onClick(e);
+        });
       });
     };
     document.head.appendChild(_scriptElem);
-    console.log(_scriptElem);
     const _observer = new ResizeObserver((entries) => {
       for (let entry of entries) {
         if (entry.target === _ref.current) {
@@ -31,6 +36,7 @@ export function MapComponent({ appKey, lat, lng, cb }) {
       }
     });
     _observer.observe(_ref.current);
+
     return () => {
       _observer.disconnect();
       _scriptElem.remove();
