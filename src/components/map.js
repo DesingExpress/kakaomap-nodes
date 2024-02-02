@@ -1,10 +1,10 @@
 import { useLayoutEffect, useRef } from "react";
 
-export function MapComponent({ appKey, lat, lng, cb, onClick }) {
+export function MapComponent({ appKey, lat, lng, cb, onClick, force }) {
   const _ref = useRef();
   useLayoutEffect(() => {
     let map;
-    // let arr = [];
+
     const _scriptElem = document.createElement("script");
     _scriptElem.type = "text/javascript";
     _scriptElem.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${appKey}&libraries=clusterer&autoload=false`;
@@ -23,6 +23,7 @@ export function MapComponent({ appKey, lat, lng, cb, onClick }) {
         cb(map);
 
         window.kakao.maps.event.addListener(map, "click", function (e) {
+          console.log(e);
           onClick(e);
         });
       });
@@ -41,6 +42,6 @@ export function MapComponent({ appKey, lat, lng, cb, onClick }) {
       _observer.disconnect();
       _scriptElem.remove();
     };
-  }, []);
+  }, [force]);
   return <div style={{ width: "100%", height: "100%" }} ref={_ref} />;
 }

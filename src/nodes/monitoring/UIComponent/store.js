@@ -17,3 +17,6 @@ export const useSettings = create((set) => ({
       ...v,
     }),
 }));
+
+export const onClickMap = { current: undefined };
+export const onClickMarker = { current: undefined };

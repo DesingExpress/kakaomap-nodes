@@ -10,6 +10,8 @@
   "dependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@design-express/node-scripts": "1.0.7",
+    "jszip": "^3.10.1",
+    "react-dom": "^18.2.0",
     "zustand": "^4.4.7"
   },
   "scripts": {

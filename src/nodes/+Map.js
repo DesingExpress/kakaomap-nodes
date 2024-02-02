@@ -1,16 +1,18 @@
 import { ImPure } from "@design-express/fabrica";
-import { MapComponent } from "./map";
+import { MapComponent } from "../components/map";
 
 export class kakaoMap extends ImPure {
   static path = "Kakao";
   static title = "Map";
   static description = "카카오 맵 API 지원 노드";
+  static num = 0;
 
   constructor() {
     super();
     this.addInput("API_key", "string");
     this.addInput("Lat", "number");
     this.addInput("Lng", "number");
+
     this.addOutput("component", "");
     this.addOutput("onReady", -1);
     this.addOutput("API", "kakaoAPI");
@@ -28,6 +30,7 @@ export class kakaoMap extends ImPure {
   }
 
   onExecute() {
+    kakaoMap.num++;
     this.setOutputData(
       1,
       <MapComponent
@@ -36,8 +39,9 @@ export class kakaoMap extends ImPure {
         lng={this.getInputData(3)}
         cb={this.MAP_API_FUNC}
         onClick={this.onClickMap}
+        force={kakaoMap.num}
       />
     );
-    this.setOutputData(2, this.MAP_API);
+    // this.setOutputData(2, this.MAP_API);
   }
 }

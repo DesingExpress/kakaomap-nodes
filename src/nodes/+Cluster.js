@@ -1,6 +1,7 @@
 import { Pure } from "@design-express/fabrica";
 // import { MapComponent } from "./map";
 
+const clustererStore = { current: undefined };
 export class Clusterer extends Pure {
   static path = "Kakao/Map_extra";
   static title = "Clusterer";
@@ -16,15 +17,15 @@ export class Clusterer extends Pure {
     this.addOutput("clusterer", "kakao::markerclusterer");
 
     this.properties = { minLevel: 3, minClusterSize: 5 };
-    this.clusterer = undefined;
+    // this.clusterer = undefined;
     this.addWidget("number", "minLevel", 3, "minLevel", { min: 1, step: 1 });
-    this.addWidget("number", "minClusterSize", 5, "minClusterSize", {
+    this.addWidget("number", "minClusterSize", 10, "minClusterSize", {
       min: 2,
       step: 1,
     });
 
     this.onChangeClusterer = () => {
-      this.setOutputData(2, this.markers);
+      this.setOutputData(2, this.clusterer);
       this.triggerSlot(1);
     };
   }
@@ -34,22 +35,23 @@ export class Clusterer extends Pure {
     const map = this.getInputData(1);
     const markers = this.getInputData(2);
     if (!map) return;
-    const clusterer = (this.clusterer = new window.kakao.maps.MarkerClusterer({
-      map: map,
-      markers: markers,
-      averageCenter: true,
-      minLevel,
-      minClusterSize,
-    }));
-
-    this.setOutputData(1, clusterer);
+    const clusterer = (clustererStore.current =
+      new window.kakao.maps.MarkerClusterer({
+        map: map,
+        markers: markers,
+        averageCenter: true,
+        minLevel,
+        minClusterSize,
+      }));
+    this.setOutputData(2, clusterer);
   }
 
-  onAction(name) {
+  async onAction(name) {
+    console.log("asd");
     switch (name) {
       case "clear":
-        if (!this.clusterer) return;
-        this.clusterer.clear();
+        if (!clustererStore.current) return;
+        await clustererStore.current.clear();
         this.onChangeClusterer();
         break;
       default:

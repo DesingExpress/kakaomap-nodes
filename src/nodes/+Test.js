@@ -8,6 +8,7 @@ export class TestInputs extends ImPure {
   constructor() {
     super();
     this.addInput("site", "");
+    this.addInput("images", "");
 
     this.addOutput("issue", "");
 
@@ -17,6 +18,8 @@ export class TestInputs extends ImPure {
 
   onExecute() {
     const site = this.getInputData(1);
+    if (!site) return;
+    const images = this.getInputData(2) ?? [];
     const { position, start_date, end_date, keywords, categories } = site;
     const { size } = this.properties;
     let timeLimits = [
@@ -25,8 +28,6 @@ export class TestInputs extends ImPure {
     ];
 
     let timeRange = timeLimits[1] - timeLimits[0];
-    let createdTime = timeLimits[0] + timeRange * Math.random();
-    let created = new Date(createdTime).toLocaleDateString("en-us");
 
     let positionLimitRange = 0.003;
     let [lat, lng] = position;
@@ -51,9 +52,11 @@ export class TestInputs extends ImPure {
         let value = values[idx];
         return [label, value];
       });
+      let createdTime = timeLimits[0] + timeRange * Math.random();
+      // let created = new Date(createdTime).toLocaleDateString("en-us");
+      let created = new Date(createdTime);
 
       return {
-        id: i + 1,
         peer_id: "abcd1234",
         position: [
           latLimits[0] + positionRanges[0] * Math.random(),
@@ -65,12 +68,64 @@ export class TestInputs extends ImPure {
         categories: cts,
         extra_data: {
           제목: "abc",
-          내용: "abcdefghijklmnopqrstuvwxyz",
-          media: [],
+          내용: "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz",
+          media: [...images],
         },
       };
     });
 
     this.setOutputData(1, inputs);
+  }
+}
+
+export class TestImageInputs extends ImPure {
+  static path = "Kakao/Map_extra";
+  static title = "TestImageInputs";
+  static description = "";
+
+  constructor() {
+    super();
+    this.addOutput("images", "");
+  }
+
+  async onExecute() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.multiple = true;
+
+    // Wrap the file reading logic in a promise
+    function handleFileSelectAsync() {
+      return new Promise((resolve) => {
+        input.addEventListener("change", resolve);
+        input.click();
+      });
+    }
+
+    let node = this;
+
+    try {
+      await handleFileSelectAsync(); // Wait for file selection to complete
+      const files = input.files;
+      const fileContents = await Promise.all(
+        Array.from(files).map((file) => readFileAsync(file))
+      );
+
+      node.setOutputData(1, fileContents);
+    } catch (error) {
+      console.error(error);
+    }
+
+    function readFileAsync(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const content = e.target.result;
+          // resolve({ name: file.name, content });
+          resolve(content);
+        };
+        // reader.readAsText(file);
+        reader.readAsDataURL(file);
+      });
+    }
   }
 }
