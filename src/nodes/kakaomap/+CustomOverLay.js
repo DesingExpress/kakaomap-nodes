@@ -35,7 +35,7 @@ export class CustomOverlay extends Pure {
       position = _position.getPosition();
     if (_position instanceof window.kakao.maps.LatLng) position = _position;
     if (Array.isArray(_position)) position = [_position.lat, _position.lng];
-    console.log(position);
+
     const content = this.getInputData(3);
 
     const overlay = (this.overlay = new window.kakao.maps.CustomOverlay({

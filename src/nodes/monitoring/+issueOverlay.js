@@ -1,8 +1,5 @@
 import { Pure } from "@design-express/fabrica";
-import { UIWrapper } from "./UIComponent";
-import { useState } from "react";
-import { Issue } from "./UIComponent/issue";
-// import { MapComponent } from "./map";
+import { Issue } from "./components/issue";
 
 export class IssueOverlay extends Pure {
   static path = "SiteIsuue";

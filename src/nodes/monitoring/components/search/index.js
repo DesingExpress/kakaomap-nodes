@@ -13,8 +13,8 @@ import {
 } from "@mui/material";
 import { ReactComponent as LogoIcon } from "../icons/LogoIcon.svg";
 import SearchIcon from "@mui/icons-material/Search";
-import { useMemo, useState } from "react";
-import { useSettings } from "../store";
+import { useEffect, useMemo, useState } from "react";
+import { useInfo, useSettings } from "../store";
 
 const StyledSearch = styled(Paper)(({ theme }) => ({
   position: "absolute",
@@ -142,28 +142,46 @@ const StyledSearch = styled(Paper)(({ theme }) => ({
   },
 }));
 export function Search({ ...props }) {
-  const { info, onSubmit } = props;
-  const { peer_id, start_date, end_date } = info;
-  const [min, max] = [
-    new Date(start_date).getTime(),
-    new Date(end_date).getTime(),
-  ];
-  const [date, setDate] = useState([min, max]);
-  const [filtered] = useSettings((state) => [state.filtered]);
-  const [condition, setCondition] = useState(1);
+  const { onSubmit } = props;
+  // const { peer_id, start_date, end_date } = info;
+  // const { peer_id } = info;
+  // const end_date = info.start_date ?? new Date();
+  // const start_date =
+  //   info.start_date ??
+  //   new Date(
+  //     end_date.getFullYear() - 1,
+  //     end_date.getMonth(),
+  //     end_date.getDay()
+  //   );
+  // const [min, max] = [
+  //   new Date(start_date).getTime(),
+  //   new Date(end_date).getTime(),
+  // ];
 
-  const marks = useMemo(() => {
+  const [peer_id, start_date, end_date] = useInfo((state) => [
+    state.peer_id,
+    state.start_date,
+    state.end_date,
+  ]);
+  const [marks, min, max, initDate] = useMemo(() => {
     let numMarker = 7;
     let num = numMarker - 1;
-    let step = (max - min) / num;
-    let result = [];
+    let _date = [new Date(start_date).getTime(), new Date(end_date).getTime()];
+    let [m, M] = _date;
+
+    let step = (M - m) / num;
+    const _marks = [];
     for (let i = 0; i < numMarker; i++) {
-      let time = min + step * i;
+      let time = m + step * i;
       let label = [0, numMarker - 1].includes(i) ? timeToDate(time) : "";
-      result.push({ value: time, label });
+      _marks.push({ value: time, label });
     }
-    return result;
-  }, [start_date, end_date]);
+    return [_marks, m, M, _date];
+  }, [start_date]);
+
+  const [date, setDate] = useState(initDate);
+  const [filtered] = useSettings((state) => [state.filtered]);
+  const [condition, setCondition] = useState(1);
 
   function timeToDate(v) {
     let enus = new Date(v).toLocaleDateString("en-US");
@@ -201,6 +219,10 @@ export function Search({ ...props }) {
 
     onSubmit(data);
   }
+
+  useEffect(() => {
+    setDate(initDate);
+  }, [start_date]);
   return (
     <StyledSearch component="form" onSubmit={handleSubmit}>
       <div className="container">

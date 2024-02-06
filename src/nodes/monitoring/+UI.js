@@ -1,9 +1,6 @@
 import { Pure } from "@design-express/fabrica";
-import { UIWrapper } from "./UIComponent";
-import { useEffect, useReducer, useState } from "react";
-import { onClickMap, onClickMarker } from "./UIComponent/store";
-// import { MapComponent } from "./map";
-
+import { UIWrapper } from "./components";
+import { onClickMap, onClickMarker, onLoadSiteInfo } from "./components/store";
 export class Wrapper extends Pure {
   static path = "SiteIsuue";
   static title = "Wrapper";
@@ -16,6 +13,7 @@ export class Wrapper extends Pure {
   constructor() {
     super();
     this.addInput("kakaomap", "component");
+    this.addInput("onLoad", -1);
     this.addInput("info", "object");
     this.addInput("onClickedMap", -1);
     this.addInput("onClickedMarker", -1);
@@ -33,9 +31,8 @@ export class Wrapper extends Pure {
 
   onExecute() {
     Wrapper.num++;
-    console.log("asdf")
     const kakaomap = this.getInputData(1);
-    const info = this.getInputData(2);
+    const info = this.getInputData(3) ?? {};
     this.setOutputData(
       1,
       <UIWrapper
@@ -55,11 +52,13 @@ export class Wrapper extends Pure {
         onClickMap?.current();
         break;
       case "onClickedMarker":
-        onClickMarker?.current(this.getInputData(5));
+        onClickMarker?.current(this.getInputData(6));
+        break;
+      case "onLoad":
+        onLoadSiteInfo?.current(this.getInputData(3));
         break;
       default:
-        this.onExecute();
-        this.triggerSlot(0);
+        super.onAction();
         break;
     }
   }

@@ -47,7 +47,6 @@ export class Clusterer extends Pure {
   }
 
   async onAction(name) {
-    console.log("asd");
     switch (name) {
       case "clear":
         if (!clustererStore.current) return;

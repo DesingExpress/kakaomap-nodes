@@ -1,10 +1,20 @@
 import { useLayoutEffect, useRef } from "react";
+// import { handlePanTo } from "./store";
 
-export function MapComponent({ appKey, lat, lng, cb, onClick, force }) {
+export function MapComponent({
+  force,
+  appKey,
+  lat,
+  lng,
+  cb,
+  onClick,
+  onPanTo,
+}) {
   const _ref = useRef();
   useLayoutEffect(() => {
-    let map;
+    // handlePanTo.current = onPanTo;
 
+    let map;
     const _scriptElem = document.createElement("script");
     _scriptElem.type = "text/javascript";
     _scriptElem.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${appKey}&libraries=clusterer&autoload=false`;
@@ -41,6 +51,7 @@ export function MapComponent({ appKey, lat, lng, cb, onClick, force }) {
     return () => {
       _observer.disconnect();
       _scriptElem.remove();
+      // handlePanTo.current = undefined;
     };
   }, [force]);
   return <div style={{ width: "100%", height: "100%" }} ref={_ref} />;

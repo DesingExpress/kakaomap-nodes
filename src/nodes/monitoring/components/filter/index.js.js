@@ -20,7 +20,7 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
-import { useSettings } from "../store";
+import { useInfo, useSettings } from "../store";
 
 const StyledFilterMenu = styled(Paper)(({ theme, count }) => ({
   position: "absolute",
@@ -136,14 +136,24 @@ const StyledItems = styled(Paper)(({ theme }) => ({
 }));
 
 export function Filter({ ...props }) {
-  const { info } = props;
-  const { categories } = info;
-  const [filtered, setSettings] = useSettings((state) => [
+  // const { info } = props;
+  // const { categories } = info;
+  const [categories] = useInfo((state) => [state.categories]);
+  const [filtered, setStore] = useSettings((state) => [
     state.filtered,
     state.setSettings,
   ]);
   const [selected, setSelected] = useState(filtered.map((e) => e[1]));
-  const [isOpen, setOpen] = useState(categories.map((e) => false));
+  const [isOpen, setOpen] = useState(filtered.map((e) => false));
+
+  useEffect(() => {
+    setSelected(filtered.map((e) => e[1]));
+    setOpen(filtered.map((e) => false));
+  }, [filtered]);
+
+  useEffect(() => {
+    setOpen(isOpen.map((e) => false));
+  }, [selected]);
 
   function handleOpen(e) {
     const { idx } = e.currentTarget.dataset;
@@ -163,22 +173,22 @@ export function Filter({ ...props }) {
     const { idx, value } = e.currentTarget.dataset;
     let _selected = [...selected];
     _selected[idx] = value;
-    const storeFiltered = categories.map((e, i) => {
-      if (i === Number(idx)) return [e.label, value];
-      else return [e.label, filtered[i][1]];
+    // const storeFiltered = (categories ?? []).map((e, i) => {
+    //   if (i === Number(idx)) return [e.label, value];
+    //   else return [e.label, filtered[i][1]];
+    // });
+    const storeFiltered = filtered.map((e, i) => {
+      if (i === Number(idx)) return [e[0], value];
+      else return [e[0], filtered[i][1]];
     });
-    setSettings({ filtered: storeFiltered });
+    setStore({ filtered: storeFiltered });
     setSelected(_selected);
   }
-
-  useEffect(() => {
-    setOpen(isOpen.map((e) => false));
-  }, [selected]);
 
   return (
     <StyledFilterMenu
       className={clsx(isOpen && "open")}
-      count={categories.length}
+      count={filtered.length}
     >
       <List>
         {categories.map(({ label, values }, i) => (
