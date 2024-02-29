@@ -22,7 +22,6 @@ export function MapComponent({
 
     _scriptElem.onload = () => {
       window.kakao.maps.load(() => {
-        // console.log(window.kakao.maps.Map);
         map = new window.kakao.maps.Map(_ref.current, {
           center: new window.kakao.maps.LatLng(
             lat ?? 33.450701,
@@ -33,7 +32,7 @@ export function MapComponent({
         cb(map);
 
         window.kakao.maps.event.addListener(map, "click", function (e) {
-          console.log(e);
+          console.log("LatLng", e);
           onClick(e);
         });
       });

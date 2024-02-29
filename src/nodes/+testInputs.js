@@ -21,7 +21,8 @@ export class TestInputs extends ImPure {
     if (!site) return;
     const images = this.getInputData(2) ?? [];
     const { position, start_date, end_date, keywords, categories } = site;
-    const { size } = this.properties;
+    // const { size } = this.properties;
+    const size = Math.round(Math.random() * 100);
     let timeLimits = [
       new Date(start_date).getTime(),
       new Date(end_date).getTime(),
@@ -53,9 +54,7 @@ export class TestInputs extends ImPure {
         return [label, value];
       });
       let createdTime = timeLimits[0] + timeRange * Math.random();
-      // let created = new Date(createdTime).toLocaleDateString("en-us");
       let created = new Date(createdTime);
-
       return {
         peer_id: "abcd1234",
         position: [
@@ -69,7 +68,9 @@ export class TestInputs extends ImPure {
         extra_data: {
           제목: "abc",
           내용: "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz",
-          media: [...images],
+          // media: images.length > 0 ? [...images] : undefined,
+          media: "",
+          _media: images[0],
         },
       };
     });
@@ -93,7 +94,6 @@ export class TestImageInputs extends ImPure {
     input.type = "file";
     input.multiple = true;
 
-    // Wrap the file reading logic in a promise
     function handleFileSelectAsync() {
       return new Promise((resolve) => {
         input.addEventListener("change", resolve);
@@ -104,7 +104,7 @@ export class TestImageInputs extends ImPure {
     let node = this;
 
     try {
-      await handleFileSelectAsync(); // Wait for file selection to complete
+      await handleFileSelectAsync();
       const files = input.files;
       const fileContents = await Promise.all(
         Array.from(files).map((file) => readFileAsync(file))
@@ -119,12 +119,12 @@ export class TestImageInputs extends ImPure {
       return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onload = function (e) {
-          const content = e.target.result;
-          // resolve({ name: file.name, content });
+          const content = new Uint8Array(e.target.result);
           resolve(content);
         };
-        // reader.readAsText(file);
-        reader.readAsDataURL(file);
+
+        // reader.readAsDataURL(file);
+        reader.readAsArrayBuffer(file);
       });
     }
   }

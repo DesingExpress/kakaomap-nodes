@@ -33,7 +33,6 @@ export class kakaoMap extends ImPure {
     };
 
     this.panTo = (v) => {
-      // const position = new window.kakao.maps.LatLng(v.lat, v.lng);
       const position = new window.kakao.maps.LatLng(...v);
       this.map.panTo(position);
     };
@@ -53,7 +52,6 @@ export class kakaoMap extends ImPure {
         onPanTo={this.onPanTo}
       />
     );
-    // this.setOutputData(2, this.MAP_API);
   }
 
   onAction(evt) {

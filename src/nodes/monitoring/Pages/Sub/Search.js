@@ -8,11 +8,8 @@ import {
   Box,
   Typography,
   typographyClasses,
-  buttonClasses,
   buttonBaseClasses,
 } from "@mui/material";
-import { ReactComponent as LogoIcon } from "../icons/LogoIcon.svg";
-import SearchIcon from "@mui/icons-material/Search";
 import { useEffect, useMemo, useState } from "react";
 import { useInfo, useSettings } from "../store";
 
@@ -39,8 +36,10 @@ const StyledSearch = styled(Paper)(({ theme }) => ({
     [`& .info`]: {
       display: "flex",
       alignItems: "center",
+      // marginRight: theme.spacing(2),
       [`& .${typographyClasses.root}`]: {
-        margin: theme.spacing(0, 0, 0, 2),
+        // margin: theme.spacing(0, 0, 0, 2),
+        padding: theme.spacing(0, 2, 0, 0),
         color: "#0C2340",
         fontFamily: `"pretendard", sans-serif`,
         fontStyle: "normal",
@@ -49,7 +48,6 @@ const StyledSearch = styled(Paper)(({ theme }) => ({
         letterSpacing: "-0.2px",
         lineHeight: "123.077%",
       },
-      marginRight: theme.spacing(2),
     },
     [`& > .${sliderClasses.root}`]: {
       display: "flex",
@@ -143,20 +141,6 @@ const StyledSearch = styled(Paper)(({ theme }) => ({
 }));
 export function Search({ ...props }) {
   const { onSubmit } = props;
-  // const { peer_id, start_date, end_date } = info;
-  // const { peer_id } = info;
-  // const end_date = info.start_date ?? new Date();
-  // const start_date =
-  //   info.start_date ??
-  //   new Date(
-  //     end_date.getFullYear() - 1,
-  //     end_date.getMonth(),
-  //     end_date.getDay()
-  //   );
-  // const [min, max] = [
-  //   new Date(start_date).getTime(),
-  //   new Date(end_date).getTime(),
-  // ];
 
   const [peer_id, start_date, end_date] = useInfo((state) => [
     state.peer_id,
@@ -187,9 +171,6 @@ export function Search({ ...props }) {
     let enus = new Date(v).toLocaleDateString("en-US");
     let [m, d, y] = enus.split("/");
     return `${y}.${m.length < 2 ? `0${m}` : m}.${d.length < 2 ? `0${d}` : d}`;
-    // let enus = new Date(v);
-    // // let [m, d, y] = enus.split("/");
-    // return enus;
   }
 
   function handleSlider(e, newValue) {
@@ -207,7 +188,6 @@ export function Search({ ...props }) {
         _v = timeToDate(Number(v));
         _v = new Date(_v);
       }
-      // data[k] = !isNaN(_v) ? Number(_v) : _v;
       data[k] = _v;
     }
 
@@ -217,18 +197,19 @@ export function Search({ ...props }) {
     data.idx = _condition;
     data.peer_id = peer_id;
 
-    onSubmit(data);
+    onSubmit("SEARCH", data);
   }
 
   useEffect(() => {
     setDate(initDate);
   }, [start_date]);
+
   return (
     <StyledSearch component="form" onSubmit={handleSubmit}>
       <div className="container">
         <Box className="info">
-          <LogoIcon />
-          <Typography>현장이슈관리</Typography>
+          {/* <LogoIcon /> */}
+          <Typography>Onsite</Typography>
         </Box>
         <Slider
           sx={{ color: "#0055F9" }}

@@ -9,11 +9,6 @@ import {
   listItemClasses,
   buttonBaseClasses,
   typographyClasses,
-  Divider,
-  dividerClasses,
-  paperClasses,
-  Chip,
-  chipClasses,
   Button,
 } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
@@ -26,7 +21,7 @@ const StyledFilterMenu = styled(Paper)(({ theme, count }) => ({
   position: "absolute",
   top: theme.spacing(2),
   right: theme.spacing(8),
-  zIndex: 1,
+  zIndex: 2,
   minWidth: "391px",
   display: "flex",
   padding: theme.spacing(1),
@@ -35,7 +30,7 @@ const StyledFilterMenu = styled(Paper)(({ theme, count }) => ({
   borderRadius: "4px",
   backgroundColor: "#94C2FF",
   boxShadow: "0px 3px 14px 2px rgba(0, 0, 0, 0.12)",
-  // transition: "height 300ms ease-in-out",
+
   [`& .${typographyClasses.root}`]: {
     color: "#0C2340",
     fontFamily: `"pretendard", sans-serif`,
@@ -44,19 +39,7 @@ const StyledFilterMenu = styled(Paper)(({ theme, count }) => ({
     lineHeight: "137.5%",
     letterSpacing: "-0.2px",
   },
-  // [`& .${chipClasses.root}`]: {
-  //   background: "#0055F9",
-  //   borderRadius: "100px",
-  //   padding: theme.spacing(0.5, 1),
-  //   [`& .MuiChip-label`]: {
-  //     color: "#FFF",
-  //     fontFamily: `"pretendard", sans-serif`,
-  //     fontSize: "1.0rem",
-  //     fontWeight: 600,
-  //     lineHeight: "137.5%",
-  //     letterSpacing: "-0.2px",
-  //   },
-  // },
+
   [`& >.${listClasses.root}`]: {
     padding: theme.spacing(2, 2.5, 2, 2.5),
     borderRadius: "8px",
@@ -80,11 +63,8 @@ const StyledFilterMenu = styled(Paper)(({ theme, count }) => ({
         alignItems: "flex-start",
         border: "1px solid #CCC",
         borderRadius: "4px",
-        // alignSelf: "stretch",
       },
-      // [`& .center`]: {
-      //   alignItems: "center",
-      // },
+
       [`& .label-text`]: {
         color: "#0055F9",
         fontWeight: 600,
@@ -136,8 +116,6 @@ const StyledItems = styled(Paper)(({ theme }) => ({
 }));
 
 export function Filter({ ...props }) {
-  // const { info } = props;
-  // const { categories } = info;
   const [categories] = useInfo((state) => [state.categories]);
   const [filtered, setStore] = useSettings((state) => [
     state.filtered,
@@ -157,8 +135,7 @@ export function Filter({ ...props }) {
 
   function handleOpen(e) {
     const { idx } = e.currentTarget.dataset;
-    // let _isOpen = [...isOpen];
-    // _isOpen[idx] = !_isOpen[idx];
+
     let _isOpen = isOpen.map((e, i) => {
       if (i === Number(idx)) {
         return !e;
@@ -173,10 +150,7 @@ export function Filter({ ...props }) {
     const { idx, value } = e.currentTarget.dataset;
     let _selected = [...selected];
     _selected[idx] = value;
-    // const storeFiltered = (categories ?? []).map((e, i) => {
-    //   if (i === Number(idx)) return [e.label, value];
-    //   else return [e.label, filtered[i][1]];
-    // });
+
     const storeFiltered = filtered.map((e, i) => {
       if (i === Number(idx)) return [e[0], value];
       else return [e[0], filtered[i][1]];
@@ -193,19 +167,9 @@ export function Filter({ ...props }) {
       <List>
         {categories.map(({ label, values }, i) => (
           <ListItem disablePadding disableGutters>
-            <Typography className={"guide-text"}>
-              {/* 항목을 선택해 주세요 */}
-              {`${label}: `}
-            </Typography>
-            {/* <Chip label={label} /> */}
+            <Typography className={"guide-text"}>{`${label}: `}</Typography>
             <ButtonBase onClick={handleOpen} data-idx={i}>
-              <Typography
-                // className={clsx(!isOpen[i] ? "item-text" : "label-text")}
-                className={"item-text"}
-              >
-                {/* {!isOpen[i] ? selected[i] : label} */}
-                {selected[i]}
-              </Typography>
+              <Typography className={"item-text"}>{selected[i]}</Typography>
               {isOpen[i] ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
             </ButtonBase>
             {isOpen[i] && (

@@ -1,12 +1,20 @@
 import { Pure } from "@design-express/fabrica";
-import { UIWrapper } from "./components";
-import { onClickMap, onClickMarker, onLoadSiteInfo } from "./components/store";
+import { UIWrapper } from "./Pages";
+import {
+  onClickMap,
+  onClickMarker,
+  onLoadSiteInfo,
+  onAddMarkers,
+} from "./Pages/store";
 export class Wrapper extends Pure {
   static path = "SiteIsuue";
   static title = "Wrapper";
   static description = "";
   static #idx = {
-    search: 2,
+    SEARCH: 2,
+    DOWNLOAD: 4,
+    LOG: 6,
+    PHOTO: 8,
   };
   static num = 1;
 
@@ -18,14 +26,36 @@ export class Wrapper extends Pure {
     this.addInput("onClickedMap", -1);
     this.addInput("onClickedMarker", -1);
     this.addInput("clicked", "");
+    this.addInput("onAddMarkers", -1);
+    this.addInput("markers", "array");
 
     this.addOutput("component", "component");
     this.addOutput("onSearch", -1);
     this.addOutput("condition", "");
+    this.addOutput("onDownload", -1);
+    this.addOutput("cid", "");
+    this.addOutput("onLog", -1);
+    this.addOutput("log", "");
+    this.addOutput("onPhoto", -1);
+    this.addOutput("photo", "");
+
+    this.onSubmit = (tag, v) => {
+      let slotIdx = Wrapper.#idx[tag];
+      this.setOutputData(slotIdx + 1, v);
+      this.triggerSlot(slotIdx);
+    };
 
     this.onSearch = (v) => {
       this.setOutputData(3, v);
       this.triggerSlot(2);
+    };
+    this.onDownload = (v) => {
+      this.setOutputData(5, v);
+      this.triggerSlot(4);
+    };
+    this.onLog = (v) => {
+      this.setOutputData(7, v);
+      this.triggerSlot(6);
     };
   }
 
@@ -39,9 +69,10 @@ export class Wrapper extends Pure {
         force={Wrapper.num}
         kakaomap={kakaomap}
         info={info}
-        onSearch={this.onSearch}
-
-        // aaa={aaa}
+        onSubmit={this.onSubmit}
+        // onSearch={this.onSearch}
+        // onDownload={this.onDownload}
+        // onLog={this.onLog}
       />
     );
   }
@@ -56,6 +87,9 @@ export class Wrapper extends Pure {
         break;
       case "onLoad":
         onLoadSiteInfo?.current(this.getInputData(3));
+        break;
+      case "onAddMarkers":
+        onAddMarkers?.current(this.getInputData(8));
         break;
       default:
         super.onAction();

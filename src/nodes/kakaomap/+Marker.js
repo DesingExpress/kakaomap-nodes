@@ -1,7 +1,8 @@
 import { ImPure } from "@design-express/fabrica";
 import { join, normalize } from "path";
 import { openFile } from "#extension:file";
-const markers = [];
+import { loadMarkerImage } from "../Monitoring/Pages/utils";
+// const markers = [];
 export class marker extends ImPure {
   static path = "Kakao/Map_extra";
   static title = "Marker";
@@ -11,6 +12,8 @@ export class marker extends ImPure {
     super();
     this.addInput("API", "kakaoAPI");
     this.addInput("positions", "object,array");
+    this.addInput("image", "");
+    this.addInput("hoverImage", "");
     this.addInput("clear", -1);
 
     this.addOutput("onChange", -1);
@@ -19,71 +22,80 @@ export class marker extends ImPure {
     this.addOutput("clicked", "kakao::marker");
 
     this.properties = { isClusterer: true };
-
+    this.markers = [];
     this.map = undefined;
-    // this.markers = [];
-    this.isDebug = !!window.__DESIGN_EXPRESS__DO_NOT_USE_THIS__;
-    // this.markerImage =
 
-    this.setMarker = async function setMarker(v, img) {
-      const { position } = v; // [lat, lng]
+    this.isDebug = !!window.__DESIGN_EXPRESS__DO_NOT_USE_THIS__;
+
+    this.setMarker = async function setMarker(v, defaultImg, hoverImg) {
+      const { position } = v;
       const clickable = true;
 
       let marker = new window.kakao.maps.Marker({
         position: new window.kakao.maps.LatLng(...position),
         map: this.getInputData(1),
         clickable,
-        image: img ?? null,
+        image: defaultImg ?? null,
       });
       marker.userData = v;
-      if (clickable)
+      if (clickable) {
         window.kakao.maps.event.addListener(marker, "click", (e) => {
           this.setOutputData(4, marker);
           this.triggerSlot(3);
         });
-      markers.push(marker);
+      }
+      // if (hoverImg) {
+      //   window.kakao.maps.event.addListener(marker, "mouseover", (e) => {
+      //     marker.setImage(hoverImg);
+      //   });
+      //   window.kakao.maps.event.addListener(marker, "mouseout", (e) => {
+      //     marker.setImage(defaultImg ?? null);
+      //   });
+      // }
+      this.markers.push(marker);
     };
 
     this.onChangeMarker = () => {
-      this.setOutputData(2, markers);
+      this.setOutputData(2, this.markers);
       this.triggerSlot(1);
+    };
+
+    this.loadMarkerImage = (binary, size) => {
+      if (!binary) return;
+      let imgSrc = window.URL.createObjectURL(new Blob([binary]));
+      let imgSize = new window.kakao.maps.Size(...size);
+      let imgOption = {
+        offset: new window.kakao.maps.Point(size[0] / 2, size[1]),
+      };
+      return new window.kakao.maps.MarkerImage(imgSrc, imgSize, imgOption);
     };
   }
 
   async onExecute() {
-    // const _clickable = this.isOutputConnected(1);
-    this.map = this.getInputData(1);
     // this.markers = [];
-    const _position = this.getInputData(2) ?? [];
+    this.map = this.getInputData(1);
+    const params = this.getInputData(2) ?? [];
 
-    let imgPath = join(
-      this.isDebug ? "assets" : "",
-      normalize(`./markerImage.png`)
-    );
-    let imgSrc = await openFile(imgPath, null).then((v) => {
-      const _url = window.URL.createObjectURL(new Blob([v]));
-      return _url;
-    });
-    let imgSize = new window.kakao.maps.Size(33, 48);
-    let imgOption = { offset: new window.kakao.maps.Point(16.5, 48) };
-    const markerImg = new window.kakao.maps.MarkerImage(
-      imgSrc,
-      imgSize,
-      imgOption
-    );
+    // const defaultImg = await loadMarkerImage("markerImage.png");
+    // const selectedImg = await loadMarkerImage("markerImage_true111.png");
+    const defaultImg = this.loadMarkerImage(this.getInputData(3), [33, 48]);
+    const hoverImg = this.loadMarkerImage(this.getInputData(4), [
+      33 * 1.2,
+      48 * 1.2,
+    ]);
 
-    if (Array.isArray(_position)) {
-      _position.forEach((v) => this.setMarker(v, markerImg));
-    } else if (typeof _position === "object") this.setMarker(_position);
+    if (Array.isArray(params)) {
+      params.forEach((v) => this.setMarker(v, defaultImg, hoverImg));
+    } else if (typeof params === "object") this.setMarker(params);
 
-    this.setOutputData(2, markers);
+    this.setOutputData(2, this.markers);
   }
 
   async onAction(name) {
     switch (name) {
       case "clear":
-        const prevMarkers = [...markers];
-        markers.splice(0);
+        const prevMarkers = [...(this.markers ?? [])];
+        this.markers = [];
         prevMarkers.forEach((v) => v.setMap(null));
         this.onChangeMarker();
         break;
