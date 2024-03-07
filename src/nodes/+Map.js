@@ -1,5 +1,5 @@
 import { ImPure } from "@design-express/fabrica";
-import { MapComponent } from "./components/map";
+import { MapComponent } from "./Components/map";
 
 export class kakaoMap extends ImPure {
   static path = "Kakao";

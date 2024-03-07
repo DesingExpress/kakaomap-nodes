@@ -28,6 +28,7 @@ export class Clusterer extends Pure {
       this.setOutputData(2, this.clusterer);
       this.triggerSlot(1);
     };
+    // this.markers = [];
   }
 
   onExecute() {

@@ -1,7 +1,5 @@
 import { ImPure } from "@design-express/fabrica";
-import { join, normalize } from "path";
-import { openFile } from "#extension:file";
-import { loadMarkerImage } from "../Monitoring/Pages/utils";
+
 // const markers = [];
 export class marker extends ImPure {
   static path = "Kakao/Map_extra";
@@ -27,7 +25,8 @@ export class marker extends ImPure {
 
     this.isDebug = !!window.__DESIGN_EXPRESS__DO_NOT_USE_THIS__;
 
-    this.setMarker = async function setMarker(v, defaultImg, hoverImg) {
+    let node = this;
+    this.setMarker = function setMarker(v, defaultImg, hoverImg) {
       const { position } = v;
       const clickable = true;
 
@@ -40,8 +39,12 @@ export class marker extends ImPure {
       marker.userData = v;
       if (clickable) {
         window.kakao.maps.event.addListener(marker, "click", (e) => {
-          this.setOutputData(4, marker);
-          this.triggerSlot(3);
+          console.log("marker", marker);
+          console.log("node", node, node.triggerSlot, node._capturedOutputs);
+          console.log("this", this, this.triggerSlot, this._capturedOutputs);
+
+          node.setOutputData(4, marker);
+          node.triggerSlot(3);
         });
       }
       // if (hoverImg) {
@@ -52,7 +55,8 @@ export class marker extends ImPure {
       //     marker.setImage(defaultImg ?? null);
       //   });
       // }
-      this.markers.push(marker);
+      // this.markers.push(marker);
+      return marker;
     };
 
     this.onChangeMarker = () => {
@@ -85,8 +89,9 @@ export class marker extends ImPure {
     ]);
 
     if (Array.isArray(params)) {
-      params.forEach((v) => this.setMarker(v, defaultImg, hoverImg));
-    } else if (typeof params === "object") this.setMarker(params);
+      this.markers = params.map((v) => this.setMarker(v, defaultImg, hoverImg));
+    } else if (typeof params === "object")
+      this.markers = [this.setMarker(params)];
 
     this.setOutputData(2, this.markers);
   }
@@ -94,10 +99,11 @@ export class marker extends ImPure {
   async onAction(name) {
     switch (name) {
       case "clear":
-        const prevMarkers = [...(this.markers ?? [])];
+        // const prevMarkers = [...this.markers];
+        if (this.markers && this.markers.length > 0) {
+          this.markers.forEach((v) => v.setMap(null));
+        }
         this.markers = [];
-        prevMarkers.forEach((v) => v.setMap(null));
-        this.onChangeMarker();
         break;
       default:
         await super.onAction();
